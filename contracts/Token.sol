@@ -39,6 +39,7 @@ contract Token {
         address _to,
         uint256 _value
     ) internal {
+        require(balanceOf[_from] >= _value);
         require(_to != address(0));
 
         balanceOf[_from] = balanceOf[_from] - _value;
@@ -51,11 +52,7 @@ contract Token {
         public
         returns (bool success)
     {
-        require(balanceOf[msg.sender] >= _value);
-
-        _transfer(msg.sender, _to, _value)
-
-        emit Transfer(msg.sender, _to, _value);
+        _transfer(msg.sender, _to, _value);
         return true;
     }
 
@@ -77,8 +74,13 @@ contract Token {
         uint256 _value
     ) 
         public
-        returns (bool success);
+        returns (bool success)
     {
+        require(_value <= allowance[_from][msg.sender]);
 
+        allowance[_from][msg.sender] = allowance[_from][msg.sender] - _value;
+
+        _transfer(_from, _to, _value);
+        return true;
     }
 }
